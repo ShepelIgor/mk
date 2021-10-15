@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 const scorpion = {
   name: 'Scorpion',
   hp: 100,
@@ -58,4 +56,3 @@ function createPlayer(player, playerObject) {
 
 createPlayer('player1', scorpion);
 createPlayer('player2', subzero);
->>>>>>> Stashed changes
