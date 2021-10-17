@@ -4,6 +4,7 @@ const $randomButton = document.querySelector('.button');
 const player1 = {
   player: 1,
   name: 'Scorpion',
+  loser: false,
   hp: 100,
   img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
   weapon: ['fire', 'kunai spear'],
@@ -15,6 +16,7 @@ const player1 = {
 const player2 = {
   player: 2,
   name: 'Sub Zero',
+  loser: false,
   hp: 100,
   img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
   weapon: ['water', 'ice'],
@@ -62,30 +64,24 @@ function lossHP(player) {
   player.hp > 0 ? player.hp -= randomTwenty() : player.hp = 0;
   $playerLife.style.width = player.hp + '%';
   if (player.hp === 0) {
-    $arenas.appendChild(playerLose(player.name));
-    $arenas.appendChild(playerWin(player.player));
     $randomButton.disabled = true;
   }
 }
 
-function playerLose(name) {
-  const $loseTitle = createElement('div', 'loseTitle');
-  $loseTitle.innerText = name + ' lose';
-
-  return $loseTitle;
-}
-
-function playerWin(num) {
-  let name = '';
-  num === 1 ? name = player2.name : name = player1.name;
-  const $winTitle = createElement('div', 'winTitle');
-  $winTitle.innerText = name + ' win';
-  return $winTitle;
+function isWinner(player) {
+    const $winTitle = createElement('div', 'winTitle');
+    $winTitle.innerText = player.name + ' win';
+    return $winTitle;
 }
 
 $randomButton.addEventListener('click', function() {
   lossHP(player1);
   lossHP(player2);
+  if (player1.hp === 0) {
+    $arenas.appendChild(isWinner(player2));
+  } else if (player2.hp === 0) {
+    $arenas.appendChild(isWinner(player1));
+  }
 })
 
 $arenas.appendChild(createPlayer(player1));
