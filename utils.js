@@ -36,7 +36,7 @@ export function createPlayer(playerObject) {
 
 }
 
-export function createReloadButton() {
+export const createReloadButton = () => {
   const $reloadWrap = createElement('div', 'reloadWrap');
   const $reloadButton = createElement('button', 'button');
   $reloadButton.innerText = 'Restart';
