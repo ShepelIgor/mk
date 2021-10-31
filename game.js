@@ -1,22 +1,82 @@
-import { createPlayer, createReloadButton, showResult, $arenas, $formFight } from './utils.js';
+import { getRandom, createReloadButton, $formFight } from './utils.js';
 import { generateLogs, renderLogs } from  './logs.js';
-import { player1 as player, player2 as enemy} from './player.js';
 import { isWinner, enemyAttack, playerAttack } from './combat.js';
+import { Player } from './classes.js'
+
+let player;
+let enemy;
 
 export default class Game {
-  start = () => {
 
-    $arenas.appendChild(createPlayer(player));
-    $arenas.appendChild(createPlayer(enemy));
+  getEnemy = async() => {
+    const body = fetch('https://reactmarathon-api.herokuapp.com/api/mk/player/choose').then(res => res.json());
+    return body;
+  };
+
+  getPlayer = async () => {
+    const body = fetch('https://reactmarathon-api.herokuapp.com/api/mk/players').then(res => res.json());
+    return body;
+  };
+
+  madeFight = async (hit,defence) => {
+    const body = fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+      method: 'POST',
+      body: JSON.stringify({
+        hit,
+        defence
+      })
+    }).then(res => res.json());
+    return body;
+  };
+
+  start = async () => {
+
+    const enemies = await this.getEnemy();
+    const players = await this.getPlayer();
+
+    const p1 = JSON.parse(localStorage.getItem('player1'));
+    const p2 = enemies;
+    player = new Player({
+      ...p1,
+      player: 1,
+      rootSelector: 'arenas'
+    })
+    enemy = new Player({
+      ...p2,
+      player: 2,
+      rootSelector: 'arenas'
+    })
+
+    const { hp: playerHP } = player;
+    const { hp: enemyHP } = enemy;
+
+    function showResult() {
+      if (playerHP === 0 && playerHP < enemyHP) {
+        isWinner(enemy);
+      } else if (enemyHP === 0 && enemyHP < playerHP) {
+        isWinner(player);
+      } else if (playerHP === 0 && enemyHP === 0) {
+        isWinner();
+      }
+    }
+
+    player.createPlayer();
+    enemy.createPlayer();
 
     renderLogs(generateLogs('start', player, enemy));
+    // const test = await this.madeFight('head','head');
 
-    $formFight.addEventListener('submit', function(e) {
+    $formFight.addEventListener('submit', async (e) => {
 
       e.preventDefault();
 
-      const {value: enemyHitValue, hit: enemyHit, defence: enemyDefence} = enemyAttack();
-      const {value: playerHitValue, hit: playerHit, defence: playerDefence} = playerAttack();
+
+      const {hit: playerHitTo, defence: playerDefenceTo} = playerAttack();
+
+      let resp = await this.madeFight(playerHitTo, playerDefenceTo);
+
+      const {value: enemyHitValue, hit: enemyHit, defence: enemyDefence} = resp.player2;
+      const {value: playerHitValue, hit: playerHit, defence: playerDefence} = resp.player1;
 
       if (enemyHit !== playerDefence) {
         player.changeHP(enemyHitValue);
