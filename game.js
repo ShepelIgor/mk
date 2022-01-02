@@ -6,7 +6,7 @@ import { Player } from './classes.js'
 let player;
 let enemy;
 
-//comment
+//comment and go to the best
 
 export default class Game {
 
