@@ -7,6 +7,7 @@ let player;
 let enemy;
 
 //comment and go to the best
+//want to commint with description
 
 export default class Game {
 
